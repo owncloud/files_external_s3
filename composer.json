@@ -7,7 +7,7 @@
         "classmap-authoritative": true
     },
     "require": {
-        "guzzlehttp/guzzle": "^5.3",
+        "guzzlehttp/guzzle": "^6.3",
         "aws/aws-sdk-php": "^3.51"
     }
 }
