@@ -23,22 +23,27 @@
 
 namespace OCA\FilesExternalS3\AppInfo;
 
+use OCA\FilesExternalS3\Auth\AccessKey;
 use OCA\FilesExternalS3\Backend\AmazonS3;
 use OCP\AppFramework\App;
+use OCP\Files\External\Auth\AuthMechanism;
+use OCP\Files\External\Config\IAuthMechanismProvider;
 use OCP\Files\External\Config\IBackendProvider;
 
 /**
  * @package OCA\FilesExternalS3\AppInfo
  */
-class Application extends App implements IBackendProvider {
+class Application extends App implements IBackendProvider, IAuthMechanismProvider {
 
     public function __construct(array $urlParams = []) {
         parent::__construct('files_external_s3', $urlParams);
 
         $container = $this->getContainer();
 
+        /** @var \OCP\Files\External\IStoragesBackendService $backendService */
         $backendService = $container->getServer()->getStoragesBackendService();
         $backendService->registerBackendProvider($this);
+        $backendService->registerAuthMechanismProvider($this);
     }
 
     /**
@@ -53,4 +58,13 @@ class Application extends App implements IBackendProvider {
         return $backends;
     }
 
+	/**
+	 * @{inheritdoc}
+	 */
+	public function getAuthMechanisms() {
+		$container = $this->getContainer();
+		return [
+			$container->query(AccessKey::class)
+		];
+	}
 }
