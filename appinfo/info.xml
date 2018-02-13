@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<info>
+    <id>files_external_s3</id>
+    <name>External Storage: S3</name>
+    <description>TODO
+    </description>
+    <summary>Integrate any S3 compatible storage as an external storage</summary>
+    <licence>GPLv2</licence>
+    <author>Robin McCorkell, Vincent Petry, Thomas Müller and many more</author>
+    <version>1.0.0</version>
+    <category>storage</category>
+    <documentation>
+    	<user>https://doc.owncloud.com/server/latest/user_manual/external_storage/external_storage.html?highlight=s3</user>
+	<admin>https://doc.owncloud.com/server/latest/admin_manual/configuration/files/external_storage/dropbox.html?highlight=s3</admin>
+    </documentation>
+    <namespace>FilesExternalS3</namespace>
+    <screenshot>TODO</screenshot>
+    <types>
+        <filesystem/>
+    </types>
+
+    <dependencies>
+        <owncloud min-version="10.0" max-version="10.0"/>
+    </dependencies>
+    <website>https://github.com/owncloud/files_external_s3/</website>
+    <bugs>https://github.com/owncloud/files_external_s3/issues</bugs>
+    <repository type="git">https://github.com/owncloud/files_external_s3.git</repository>
+</info>

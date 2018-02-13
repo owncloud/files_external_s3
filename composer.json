@@ -1,0 +1,13 @@
+{
+    "name": "files_external_s3",
+    "description": "files external adapter for S3",
+    "license": "GPLv2",
+    "config": {
+        "optimize-autoloader": true,
+        "classmap-authoritative": true
+    },
+    "require": {
+        "guzzlehttp/guzzle": "^5.3",
+        "aws/aws-sdk-php": "^3.51"
+    }
+}
