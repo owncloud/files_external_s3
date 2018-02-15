@@ -224,10 +224,20 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 			do {
 				// instead of the iterator, manually loop over the list ...
 				$objects = $this->getConnection()->listObjects($params);
+				$keys = $objects->getPath('Contents/*/Key');
+				if (empty($keys)) {
+					continue;
+				}
+				$keys = array_map(function ($key) {
+					echo $key;
+					return array('Key' => $key);
+				}, $keys);
 				// ... so we can delete the files in batches
 				$this->getConnection()->deleteObjects([
 					'Bucket' => $this->bucket,
-					'Objects' => $objects['Contents']
+					'Delete' => [
+						'Objects' => $keys
+					]
 				]);
 				$this->testTimeout();
 				// we reached the end when the list is no longer truncated
