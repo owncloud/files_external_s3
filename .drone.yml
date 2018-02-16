@@ -1,0 +1,183 @@
+workspace:
+  base: /drone
+  path: server/apps/files_external_s3
+
+branches: [ master ]
+
+pipeline:
+#  restore:
+#    image: plugins/s3-cache:1
+#    pull: true
+#    secrets: [ cache_s3_server, cache_s3_access_key, cache_s3_secret_key ]
+#    restore: true
+#    when:
+#      local: false
+
+  install-server:
+    image: owncloudci/core
+    pull: true
+    version: ${OC_VERSION}
+
+  composer:
+    image: owncloudci/php:${PHP_VERSION}
+    pull: true
+    commands:
+      - composer install -n --no-progress
+
+  # this is currently necessary since
+  # the nightly tarballs do not include proper symlinks
+  fix-phpunit:
+    image: owncloudci/php:${PHP_VERSION}
+    commands:
+      - cd /drone/server
+      - chmod +x lib/composer/phpunit/phpunit/phpunit
+      - rm lib/composer/bin/phpunit
+      - ln -s ../phpunit/phpunit/phpunit lib/composer/bin/phpunit
+
+  phpunit:
+    image: owncloudci/php:${PHP_VERSION}
+    environment:
+      - COVERAGE=${COVERAGE}
+      - STORAGE=${STORAGE}
+    commands:
+      - bash tests/drone/run.sh;
+
+  codecov:
+    image: plugins/codecov:2
+    secrets: [codecov_token]
+    pull: true
+    files:
+     - tests/output/*.xml
+    when:
+      event: [push, pull_request]
+      status:  [ sucess, failure ]
+      matrix:
+        COVERAGE: true
+
+  print-log:
+    image: owncloudci/php:${PHP_VERSION}
+    pull: true
+    commands:
+      - cat /drone/server/data/owncloud.log
+    when:
+      status:  [ failure ]
+
+#  rebuild:
+#    image: plugins/s3-cache:1
+#    pull: true
+#    secrets: [ cache_s3_server, cache_s3_access_key, cache_s3_secret_key ]
+#    rebuild: true
+#    mount:
+#      - composer
+#      - vendor
+#    when:
+#      local: false
+#      event: [ push ]
+#      branch: [ master ]
+#
+#  flush:
+#    image: plugins/s3-cache:1
+#    pull: true
+#    secrets: [ cache_s3_server, cache_s3_access_key, cache_s3_secret_key ]
+#    flush: true
+#    flush_age: 14
+#    when:
+#      local: false
+#      event: [ push ]
+#      branch: [ master ]
+
+services:
+  scality:
+    image: scality/s3server:mem-latest
+    pull: true
+    environment:
+      - HOST_NAME=scality
+      - SCALITY_ACCESS_KEY_ID=owncloud123456
+      - SCALITY_SECRET_ACCESS_KEY=secret123456
+    when:
+      matrix:
+        STORAGE: scality
+
+  ceph:
+    image: ceph/demo:tag-build-master-jewel-ubuntu-16.04
+    pull: true
+    environment:
+      - NETWORK_AUTO_DETECT=4
+      - RGW_NAME=ceph
+      - CEPH_DEMO_UID=owncloud
+      - CEPH_DEMO_ACCESS_KEY=owncloud123456
+      - CEPH_DEMO_SECRET_KEY=secret123456
+    when:
+      matrix:
+        STORAGE: ceph
+
+  minio:
+    image: minio/minio
+    pull: true
+    environment:
+      - MINIO_ACCESS_KEY=owncloud123456
+      - MINIO_SECRET_KEY=secret123456
+    command: ['server', '/data']
+    when:
+      matrix:
+        STORAGE: minio
+
+matrix:
+  include:
+    # 5.6
+    #- STORAGE: ceph
+    #  PHP_VERSION: 5.6
+    #  OC_VERSION: daily-stable10-qa
+
+    - STORAGE: scality
+      PHP_VERSION: 5.6
+      OC_VERSION: daily-stable10-qa
+
+    #- STORAGE: minio
+    #  PHP_VERSION: 5.6
+    #  OC_VERSION: daily-stable10-qa
+
+    # 7.0
+    #- STORAGE: ceph
+    #  PHP_VERSION: 7.0
+    #  OC_VERSION: daily-stable10-qa
+
+    - STORAGE: scality
+      PHP_VERSION: 7.0
+      OC_VERSION: daily-stable10-qa
+
+    #- STORAGE: minio
+    #  PHP_VERSION: 7.0
+    #  OC_VERSION: daily-stable10-qa
+
+    # 7.1
+    - STORAGE: ceph
+      PHP_VERSION: 7.1
+      OC_VERSION: daily-stable10-qa
+      COVERAGE: true
+
+    - STORAGE: scality
+      PHP_VERSION: 7.1
+      OC_VERSION: daily-stable10-qa
+
+    - STORAGE: minio
+      PHP_VERSION: 7.1
+      OC_VERSION: daily-stable10-qa
+
+    - STORAGE: scality
+      PHP_VERSION: 7.1
+      OC_VERSION: daily-master-qa
+
+    # 7.2
+    #- STORAGE: ceph
+    #  PHP_VERSION: 7.2
+    #  OC_VERSION: daily-stable10-qa
+
+    - STORAGE: scality
+      PHP_VERSION: 7.2
+      OC_VERSION: daily-stable10-qa
+
+    #- STORAGE: minio
+    #  PHP_VERSION: 7.2
+    #  OC_VERSION: daily-stable10-qa
+
