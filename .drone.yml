@@ -50,7 +50,7 @@ pipeline:
      - tests/output/*.xml
     when:
       event: [push, pull_request]
-      status:  [ sucess, failure ]
+      status:  [ success, failure ]
       matrix:
         COVERAGE: true
 
