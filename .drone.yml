@@ -24,16 +24,6 @@ pipeline:
     commands:
       - composer install -n --no-progress
 
-  # this is currently necessary since
-  # the nightly tarballs do not include proper symlinks
-  fix-phpunit:
-    image: owncloudci/php:${PHP_VERSION}
-    commands:
-      - cd /drone/server
-      - chmod +x lib/composer/phpunit/phpunit/phpunit
-      - rm lib/composer/bin/phpunit
-      - ln -s ../phpunit/phpunit/phpunit lib/composer/bin/phpunit
-
   phpunit:
     image: owncloudci/php:${PHP_VERSION}
     environment:
