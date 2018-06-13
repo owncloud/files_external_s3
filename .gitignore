@@ -1,3 +1,5 @@
 vendor
 tests/output
 tests/unit/config.php
+
+.php_cs.cache

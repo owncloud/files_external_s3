@@ -9,5 +9,8 @@
     "require": {
         "guzzlehttp/guzzle": "^5.3",
         "aws/aws-sdk-php": "^3.51"
+    },
+    "require-dev": {
+        "owncloud/coding-standard": "^1.0"
     }
 }
