@@ -36,14 +36,13 @@ use OCA\FilesExternalS3\Storage\AmazonS3;
  * @package OCA\Files_External\Tests\Storage
  */
 class Amazons3Test extends \Test\Files\Storage\Storage {
-
 	private $config;
 
 	protected function setUp() {
 		parent::setUp();
 
 		$this->config = include __DIR__.'/config.php';
-		if ( ! is_array($this->config) or ! $this->config['run']) {
+		if (! \is_array($this->config) or ! $this->config['run']) {
 			$this->markTestSkipped('AmazonS3 backend not configured');
 		}
 		$this->instance = new AmazonS3($this->config);
