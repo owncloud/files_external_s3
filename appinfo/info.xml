@@ -2,19 +2,24 @@
 <info>
     <id>files_external_s3</id>
     <name>External Storage: S3</name>
-    <description>TODO
+    <description>
+With ownCloud you can leverage storage that already exists in your enterprise. Administrators can for example decide to store the most sensitive data on-premises and less sensitive data in the cloud while making all of your files available through a single user interface and enabling compliance with your chosen security and governance policies. This highly facilitates data infrastructure modernization in your business without the need of data migration or major investments in new storage systems. Using ownCloud it is possible to integrate a wide range of storage types and make them accessible from all devices under the specified security policies in ownCloud. ownCloud works as an additional layer, providing users with a single point of access to their files on all storage locations.
+
+This extension enables ownCloud Server to communicate with the widely spread S3 protocol (S3 HTTP API) to integrate object storages as external storages. Once an object storage is integrated by an administrator or the user in self-service, users see a folder structure that mirrors the hierarchy of the external storage. Users can then selectively sync files to their desktop or access them on mobile devices like any other file in ownCloud. The files will remain on the external storage but are now accessible in a secure and fully logged and traceable way through ownCloud.
+
+Administrators and users (when enabled) can find external storage configuration options in the 'Storage' section of admin and user settings, respectively.
     </description>
-    <summary>Integrate any S3 compatible storage as an external storage</summary>
+    <summary>Integrate S3 object storages as external storages</summary>
     <licence>GPLv2</licence>
     <author>Robin McCorkell, Vincent Petry, Thomas Müller and many more</author>
     <version>1.0.0</version>
     <category>storage</category>
     <documentation>
-    	<user>https://doc.owncloud.com/server/latest/user_manual/external_storage/external_storage.html?highlight=s3</user>
-	<admin>https://doc.owncloud.com/server/latest/admin_manual/configuration/files/external_storage/dropbox.html?highlight=s3</admin>
+    	<user>https://doc.owncloud.com/server/latest/user_manual/external_storage/external_storage.html</user>
+	<admin>https://doc.owncloud.com/server/latest/admin_manual/configuration/files/external_storage/amazons3.html</admin>
     </documentation>
     <namespace>FilesExternalS3</namespace>
-    <screenshot>TODO</screenshot>
+    <screenshot>https://raw.githubusercontent.com/owncloud/screenshots/master/objectstorage/ownCloud-app-s3-primary-objectstorage.jpg</screenshot>
     <types>
         <filesystem/>
     </types>
