@@ -57,6 +57,45 @@ class Amazons3Test extends \Test\Files\Storage\Storage {
 		parent::tearDown();
 	}
 
+	/**
+	 * @dataProvider directoryProvider
+	 */
+	public function testDirectories($directory) {
+		$this->markTestSkipped('S3 doesn\'t handle directories correctly - see issue 7');
+	}
+
+	public function testRecursiveRmdir() {
+		$this->markTestSkipped('S3 doesn\'t handle directories correctly - see issue 7');
+	}
+
+	public function testRmdirEmptyFolder() {
+		$this->markTestSkipped('S3 doesn\'t handle directories correctly - see issue 7');
+	}
+
+	public function testRecursiveUnlink() {
+		$this->markTestSkipped('S3 doesn\'t handle directories correctly - see issue 7');
+	}
+
+	public function testRenameDirectory() {
+		$this->markTestSkipped('S3 doesn\'t handle directories correctly - see issue 7');
+	}
+
+	public function testRenameOverWriteDirectory() {
+		$this->markTestSkipped('S3 doesn\'t handle directories correctly - see issue 7');
+	}
+
+	public function testRenameOverWriteDirectoryOverFile() {
+		$this->markTestSkipped('S3 doesn\'t handle directories correctly - see issue 7');
+	}
+
+	public function testCopyDirectory() {
+		$this->markTestSkipped('S3 doesn\'t handle directories correctly - see issue 7');
+	}
+
+	public function testCopyOverWriteDirectory() {
+		$this->markTestSkipped('S3 doesn\'t handle directories correctly - see issue 7');
+	}
+
 	public function testStat() {
 		$this->markTestSkipped('S3 doesn\'t update the parents folder mtime');
 	}
