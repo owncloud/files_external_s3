@@ -42,6 +42,15 @@ pipeline:
       matrix:
         STORAGE: ceph
 
+  prepare-bucket-minio:
+    image: owncloudci/php:${PHP_VERSION}
+    pull: true
+    commands:
+      - wait-for-it minio:9000
+    when:
+      matrix:
+        STORAGE: minio
+
   phpunit:
     image: owncloudci/php:${PHP_VERSION}
     pull: true
