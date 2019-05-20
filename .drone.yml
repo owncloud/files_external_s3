@@ -165,10 +165,10 @@ matrix:
       PHP_VERSION: 7.1
       OC_VERSION: daily-stable10-qa
 
-    - STORAGE: minio
-      PHP_VERSION: 7.1
-      OC_VERSION: daily-stable10-qa
-      COVERAGE: true
+    #- STORAGE: minio
+    #  PHP_VERSION: 7.1
+    #  OC_VERSION: daily-stable10-qa
+    #  COVERAGE: true
 
     - STORAGE: scality
       PHP_VERSION: 7.1
