@@ -24,33 +24,6 @@ pipeline:
     commands:
       - composer install -n --no-progress
 
-  prepare-bucket-scality:
-    image: owncloudci/php:${PHP_VERSION}
-    pull: true
-    commands:
-      - wait-for-it scality:8000
-    when:
-      matrix:
-        STORAGE: scality
-
-  prepare-bucket-ceph:
-    image: owncloudci/php:${PHP_VERSION}
-    pull: true
-    commands:
-      - wait-for-it ceph:80
-    when:
-      matrix:
-        STORAGE: ceph
-
-  prepare-bucket-minio:
-    image: owncloudci/php:${PHP_VERSION}
-    pull: true
-    commands:
-      - wait-for-it minio:9000
-    when:
-      matrix:
-        STORAGE: minio
-
   phpunit:
     image: owncloudci/php:${PHP_VERSION}
     pull: true
