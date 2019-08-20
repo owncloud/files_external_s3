@@ -6,8 +6,10 @@
         "optimize-autoloader": true,
         "classmap-authoritative": true
     },
+    "replace": {
+        "guzzlehttp/guzzle": "*"
+    },
     "require": {
-        "guzzlehttp/guzzle": "^5.3",
         "aws/aws-sdk-php": "^3.93"
     }
 }
