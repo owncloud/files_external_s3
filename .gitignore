@@ -1,3 +1,4 @@
 vendor
+build
 tests/output
 tests/unit/config.php
