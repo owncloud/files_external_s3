@@ -25,7 +25,7 @@ Administrators and users (when enabled) can find external storage configuration 
     </types>
 
     <dependencies>
-        <owncloud min-version="10" max-version="10"/>
+        <owncloud min-version="10.3" max-version="10"/>
     </dependencies>
     <website>https://github.com/owncloud/files_external_s3/</website>
     <bugs>https://github.com/owncloud/files_external_s3/issues</bugs>
