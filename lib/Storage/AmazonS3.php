@@ -531,7 +531,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function test() {
-		if ($this->getConnection()->getApi()->hasOperation('getBucketAcl')) {
+		if ($this->getConnection()->getApi()->hasOperation('GetBucketAcl')) {
 
 			$test = $this->getConnection()->getBucketAcl([
 				'Bucket' => $this->bucket,
