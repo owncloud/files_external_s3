@@ -2,7 +2,7 @@ workspace:
   base: /drone
   path: server/apps/files_external_s3
 
-branches: [ master ]
+branches: [ master, release* ]
 
 pipeline:
 #  restore:
