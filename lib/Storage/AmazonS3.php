@@ -260,21 +260,21 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 
 		try {
 			$files = [];
-			$result = $this->getConnection()->getIterator('ListObjects', [
+			$result = $this->getConnection()->getPaginator('ListObjects', [
 				'Bucket' => $this->bucket,
 				'Delimiter' => '/',
 				'Prefix' => $path
-			], ['return_prefixes' => true]);
+			]);
 
-			foreach ($result as $object) {
-				if (isset($object['Key']) && $object['Key'] === $path) {
-					// it's the directory itself, skip
-					continue;
+			foreach ($result->search('[CommonPrefixes[].Prefix, Contents[].Key][]') as $object) {
+				if (\is_string($object)) {
+					if ($object === $path) {
+						// it's the directory itself, skip
+						continue;
+					}
+					$file = \basename($object);
+					$files[] = $file;
 				}
-				$file = basename(
-					isset($object['Key']) ? $object['Key'] : $object['Prefix']
-				);
-				$files[] = $file;
 			}
 
 			return IteratorDirectory::wrap($files);
