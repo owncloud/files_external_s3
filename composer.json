@@ -1,5 +1,5 @@
 {
-    "name": "files_external_s3",
+    "name": "owncloud/files_external_s3",
     "description": "files external adapter for S3",
     "license": "GPLv2",
     "config": {
