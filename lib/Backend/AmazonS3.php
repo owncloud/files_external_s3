@@ -30,7 +30,6 @@ use OCP\Files\External\DefinitionParameter;
 use OCP\IL10N;
 
 class AmazonS3 extends Backend {
-
 	public function __construct(IL10N $l) {
 		$this
 			->setIdentifier('files_external_s3')
@@ -52,5 +51,4 @@ class AmazonS3 extends Backend {
 			->addAuthScheme(AccessKey::SCHEME_AMAZONS3_ACCESSKEY);
 		;
 	}
-
 }
