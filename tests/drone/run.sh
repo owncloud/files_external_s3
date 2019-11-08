@@ -48,9 +48,9 @@ main () {
 
   # run unit tests
   if [[ "${COVERAGE}" == "true" ]]; then
-    phpdbg -d memory_limit=4096M -rr ./lib/composer/bin/phpunit --configuration "${BASE_DIR}/tests/unit/phpunit.xml"
+    phpdbg -d memory_limit=4096M -rr ./lib/composer/bin/phpunit --configuration "${BASE_DIR}/phpunit.xml"
   else
-    ./lib/composer/bin/phpunit --configuration "${BASE_DIR}/tests/unit/phpunit.xml"
+    ./lib/composer/bin/phpunit --configuration "${BASE_DIR}/phpunit.xml"
   fi
 
 }
