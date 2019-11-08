@@ -2,7 +2,7 @@
 
 return [
 	'run'           => true,
-	'bucket'        => 'octesting',
+	'bucket'        => 'owncloud',
 	'hostname'      => 'scality',
 	'port'          => '8000',
 	'key'           => 'owncloud123456',
