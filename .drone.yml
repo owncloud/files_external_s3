@@ -1,7 +1,7 @@
 ---
 kind: pipeline
 type: docker
-name: coding-standard-php7.0
+name: coding-standard-php7.1
 
 platform:
   os: linux
@@ -14,7 +14,7 @@ workspace:
 steps:
 - name: coding-standard
   pull: always
-  image: owncloudci/php:7.0
+  image: owncloudci/php:7.1
   commands:
   - make test-php-style
 
@@ -23,113 +23,6 @@ trigger:
   - refs/pull/**
   - refs/tags/**
   - refs/heads/master
-
----
-kind: pipeline
-type: docker
-name: phpunit-scality-php7.0-sqlite
-
-platform:
-  os: linux
-  arch: amd64
-
-workspace:
-  base: /var/www/owncloud
-  path: server/apps/files_external_s3
-
-steps:
-- name: install-core
-  pull: always
-  image: owncloudci/core
-  settings:
-    core_path: /var/www/owncloud/server
-    db_host: sqlite
-    db_name: owncloud
-    db_password: owncloud
-    db_type: sqlite
-    db_username: owncloud
-    exclude: apps/files_external_s3
-    version: daily-master-qa
-
-- name: install-app-files_external_s3
-  pull: always
-  image: owncloudci/php:7.0
-  commands:
-  - cd /var/www/owncloud/server/apps/files_external_s3
-  - composer install -n --no-progress
-
-- name: install-extra-apps
-  pull: always
-  image: owncloudci/php:7.0
-  commands:
-  - git clone https://github.com/owncloud/files_primary_s3.git /var/www/owncloud/testrunner/apps/files_primary_s3
-  - cp -r /var/www/owncloud/testrunner/apps/files_primary_s3 /var/www/owncloud/server/apps/
-  - cd /var/www/owncloud/server/apps/files_primary_s3
-  - composer install
-  - cd /var/www/owncloud/server
-  - php occ a:l
-  - php occ a:e files_primary_s3
-  - php occ a:l
-
-- name: setup-server-files_external_s3
-  pull: always
-  image: owncloudci/php:7.0
-  commands:
-  - cd /var/www/owncloud/server
-  - php occ a:l
-  - php occ a:e files_external_s3
-  - php occ a:e testing
-  - php occ a:l
-  - php occ config:system:set trusted_domains 1 --value=server
-  - php occ log:manage --level 2
-
-- name: setup-scality
-  pull: always
-  image: owncloudci/php:7.0
-  commands:
-  - wait-for-it -t 60 scality:8000
-  - cd /var/www/owncloud/server/apps/files_primary_s3
-  - cp tests/drone/scality.config.php /var/www/owncloud/server/config
-  - cd /var/www/owncloud/server
-
-- name: scality-config
-  pull: always
-  image: owncloudci/php:7.2
-  commands:
-  - cp tests/drone/configs/config.scality.php tests/unit/config.php
-
-- name: phpunit-tests
-  pull: always
-  image: owncloudci/php:7.0
-  commands:
-  - make test-php-unit-dbg
-
-- name: codecov-upload
-  pull: always
-  image: plugins/codecov:2
-  settings:
-    paths:
-    - tests/output/clover.xml
-    token:
-      from_secret: codecov_token
-
-services:
-- name: scality
-  pull: always
-  image: owncloudci/scality-s3server
-  environment:
-    HOST_NAME: scality
-    SCALITY_ACCESS_KEY_ID: owncloud123456
-    SCALITY_SECRET_ACCESS_KEY: secret123456
-
-trigger:
-  ref:
-  - refs/pull/**
-  - refs/tags/**
-  - refs/heads/master
-
-depends_on:
-- coding-standard-php7.0
 
 ---
 kind: pipeline
@@ -192,9 +85,9 @@ steps:
 
 - name: setup-scality
   pull: always
-  image: owncloudci/php:7.0
+  image: owncloudci/php:7.1
   commands:
-  - wait-for-it -t 60 scality:8000
+  - wait-for-it -t 120 scality:8000
   - cd /var/www/owncloud/server/apps/files_primary_s3
   - cp tests/drone/scality.config.php /var/www/owncloud/server/config
   - cd /var/www/owncloud/server
@@ -236,7 +129,7 @@ trigger:
   - refs/heads/master
 
 depends_on:
-- coding-standard-php7.0
+- coding-standard-php7.1
 
 ---
 kind: pipeline
@@ -299,9 +192,9 @@ steps:
 
 - name: setup-scality
   pull: always
-  image: owncloudci/php:7.0
+  image: owncloudci/php:7.1
   commands:
-  - wait-for-it -t 60 scality:8000
+  - wait-for-it -t 120 scality:8000
   - cd /var/www/owncloud/server/apps/files_primary_s3
   - cp tests/drone/scality.config.php /var/www/owncloud/server/config
   - cd /var/www/owncloud/server
@@ -343,7 +236,7 @@ trigger:
   - refs/heads/master
 
 depends_on:
-- coding-standard-php7.0
+- coding-standard-php7.1
 
 ---
 kind: pipeline
@@ -406,9 +299,9 @@ steps:
 
 - name: setup-scality
   pull: always
-  image: owncloudci/php:7.0
+  image: owncloudci/php:7.1
   commands:
-  - wait-for-it -t 60 scality:8000
+  - wait-for-it -t 120 scality:8000
   - cd /var/www/owncloud/server/apps/files_primary_s3
   - cp tests/drone/scality.config.php /var/www/owncloud/server/config
   - cd /var/www/owncloud/server
@@ -450,117 +343,7 @@ trigger:
   - refs/heads/master
 
 depends_on:
-- coding-standard-php7.0
-
----
-kind: pipeline
-type: docker
-name: phpunit-ceph-php7.0-sqlite
-
-platform:
-  os: linux
-  arch: amd64
-
-workspace:
-  base: /var/www/owncloud
-  path: server/apps/files_external_s3
-
-steps:
-- name: install-core
-  pull: always
-  image: owncloudci/core
-  settings:
-    core_path: /var/www/owncloud/server
-    db_host: sqlite
-    db_name: owncloud
-    db_password: owncloud
-    db_type: sqlite
-    db_username: owncloud
-    exclude: apps/files_external_s3
-    version: daily-master-qa
-
-- name: install-app-files_external_s3
-  pull: always
-  image: owncloudci/php:7.0
-  commands:
-  - cd /var/www/owncloud/server/apps/files_external_s3
-  - composer install -n --no-progress
-
-- name: install-extra-apps
-  pull: always
-  image: owncloudci/php:7.0
-  commands:
-  - git clone https://github.com/owncloud/files_primary_s3.git /var/www/owncloud/testrunner/apps/files_primary_s3
-  - cp -r /var/www/owncloud/testrunner/apps/files_primary_s3 /var/www/owncloud/server/apps/
-  - cd /var/www/owncloud/server/apps/files_primary_s3
-  - composer install
-  - cd /var/www/owncloud/server
-  - php occ a:l
-  - php occ a:e files_primary_s3
-  - php occ a:l
-
-- name: setup-server-files_external_s3
-  pull: always
-  image: owncloudci/php:7.0
-  commands:
-  - cd /var/www/owncloud/server
-  - php occ a:l
-  - php occ a:e files_external_s3
-  - php occ a:e testing
-  - php occ a:l
-  - php occ config:system:set trusted_domains 1 --value=server
-  - php occ log:manage --level 2
-
-- name: setup-ceph
-  pull: always
-  image: owncloudci/php:7.0
-  commands:
-  - wait-for-it -t 60 ceph:80
-  - cd /var/www/owncloud/server/apps/files_primary_s3
-  - cp tests/drone/ceph.config.php /var/www/owncloud/server/config
-  - cd /var/www/owncloud/server
-  - ./apps/files_primary_s3/tests/drone/create-bucket.sh
-
-- name: ceph-config
-  pull: always
-  image: owncloudci/php:7.2
-  commands:
-  - cp tests/drone/configs/config.ceph.php tests/unit/config.php
-
-- name: phpunit-tests
-  pull: always
-  image: owncloudci/php:7.0
-  commands:
-  - make test-php-unit-dbg
-
-- name: codecov-upload
-  pull: always
-  image: plugins/codecov:2
-  settings:
-    paths:
-    - tests/output/clover.xml
-    token:
-      from_secret: codecov_token
-
-services:
-- name: ceph
-  pull: always
-  image: owncloudci/ceph:tag-build-master-jewel-ubuntu-16.04
-  environment:
-    CEPH_DEMO_ACCESS_KEY: owncloud123456
-    CEPH_DEMO_SECRET_KEY: secret123456
-    CEPH_DEMO_UID: owncloud
-    NETWORK_AUTO_DETECT: 4
-    RGW_NAME: ceph
-
-trigger:
-  ref:
-  - refs/pull/**
-  - refs/tags/**
-  - refs/heads/master
-
-depends_on:
-- coding-standard-php7.0
+- coding-standard-php7.1
 
 ---
 kind: pipeline
@@ -623,9 +406,9 @@ steps:
 
 - name: setup-ceph
   pull: always
-  image: owncloudci/php:7.0
+  image: owncloudci/php:7.1
   commands:
-  - wait-for-it -t 60 ceph:80
+  - wait-for-it -t 120 ceph:80
   - cd /var/www/owncloud/server/apps/files_primary_s3
   - cp tests/drone/ceph.config.php /var/www/owncloud/server/config
   - cd /var/www/owncloud/server
@@ -670,7 +453,7 @@ trigger:
   - refs/heads/master
 
 depends_on:
-- coding-standard-php7.0
+- coding-standard-php7.1
 
 ---
 kind: pipeline
@@ -733,9 +516,9 @@ steps:
 
 - name: setup-ceph
   pull: always
-  image: owncloudci/php:7.0
+  image: owncloudci/php:7.1
   commands:
-  - wait-for-it -t 60 ceph:80
+  - wait-for-it -t 120 ceph:80
   - cd /var/www/owncloud/server/apps/files_primary_s3
   - cp tests/drone/ceph.config.php /var/www/owncloud/server/config
   - cd /var/www/owncloud/server
@@ -780,7 +563,7 @@ trigger:
   - refs/heads/master
 
 depends_on:
-- coding-standard-php7.0
+- coding-standard-php7.1
 
 ---
 kind: pipeline
@@ -843,9 +626,9 @@ steps:
 
 - name: setup-ceph
   pull: always
-  image: owncloudci/php:7.0
+  image: owncloudci/php:7.1
   commands:
-  - wait-for-it -t 60 ceph:80
+  - wait-for-it -t 120 ceph:80
   - cd /var/www/owncloud/server/apps/files_primary_s3
   - cp tests/drone/ceph.config.php /var/www/owncloud/server/config
   - cd /var/www/owncloud/server
@@ -890,7 +673,7 @@ trigger:
   - refs/heads/master
 
 depends_on:
-- coding-standard-php7.0
+- coding-standard-php7.1
 
 ---
 kind: pipeline
@@ -922,11 +705,9 @@ trigger:
   - failure
 
 depends_on:
-- phpunit-scality-php7.0-sqlite
 - phpunit-scality-php7.1-sqlite
 - phpunit-scality-php7.2-sqlite
 - phpunit-scality-php7.3-sqlite
-- phpunit-ceph-php7.0-sqlite
 - phpunit-ceph-php7.1-sqlite
 - phpunit-ceph-php7.2-sqlite
 - phpunit-ceph-php7.3-sqlite
