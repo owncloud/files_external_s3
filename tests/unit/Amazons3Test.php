@@ -38,7 +38,7 @@ use OCA\FilesExternalS3\Storage\AmazonS3;
 class Amazons3Test extends \Test\Files\Storage\Storage {
 	private $config;
 
-	protected function setUp() {
+	protected function setUp(): void {
 		parent::setUp();
 
 		$this->config = include __DIR__.'/config.php';
@@ -48,7 +48,7 @@ class Amazons3Test extends \Test\Files\Storage\Storage {
 		$this->instance = new AmazonS3($this->config);
 	}
 
-	protected function tearDown() {
+	protected function tearDown(): void {
 		if ($this->instance) {
 			$this->instance->rmdir('');
 		}
