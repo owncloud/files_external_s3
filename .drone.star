@@ -13,7 +13,7 @@ config = {
 
 	'codestyle': True,
 
-	'phpstan': False,
+	'phpstan': True,
 
 	'phan': False,
 

@@ -39,8 +39,11 @@ class Application extends App implements IBackendProvider, IAuthMechanismProvide
 
 		$container = $this->getContainer();
 
+		/** @var \OC\Server $server */
+		$server= $container->getServer();
+
 		/** @var \OCP\Files\External\IStoragesBackendService $backendService */
-		$backendService = $container->getServer()->getStoragesBackendService();
+		$backendService = $server->getStoragesBackendService();
 		$backendService->registerBackendProvider($this);
 		$backendService->registerAuthMechanismProvider($this);
 	}
