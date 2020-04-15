@@ -115,7 +115,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	/**
 	 * AmazonS3 constructor.
 	 *
-	 * @param $params
+	 * @param array $params
 	 * @throws \Exception
 	 */
 	public function __construct($params) {
@@ -206,7 +206,6 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 		} catch (\Exception $e) {
 			return $this->batchDelete();
 		}
-		return false;
 	}
 
 	private function batchDelete($path = null) {
@@ -531,7 +530,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 			$test = $this->getConnection()->getBucketAcl([
 				'Bucket' => $this->bucket,
 			]);
-			if (isset($test) && $test->getPath('Owner/ID') !== null) {
+			if ($test !== null && $test->getPath('Owner/ID') !== null) {
 				return true;
 			}
 			return false;
@@ -591,7 +590,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 				return;
 			}
 			// force content length header on empty body
-			$request->setHeader('Content-Length', 0);
+			$request->setHeader('Content-Length', '0');
 		});
 		$h = new GuzzleHandler($client);
 		$config['http_handler'] = $h;
