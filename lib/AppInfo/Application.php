@@ -26,7 +26,6 @@ namespace OCA\FilesExternalS3\AppInfo;
 use OCA\FilesExternalS3\Auth\AccessKey;
 use OCA\FilesExternalS3\Backend\AmazonS3;
 use OCP\AppFramework\App;
-use OCP\Files\External\Auth\AuthMechanism;
 use OCP\Files\External\Config\IAuthMechanismProvider;
 use OCP\Files\External\Config\IBackendProvider;
 
@@ -41,8 +40,7 @@ class Application extends App implements IBackendProvider, IAuthMechanismProvide
 
 		/** @var \OC\Server $server */
 		$server= $container->getServer();
-
-		/** @var \OCP\Files\External\IStoragesBackendService $backendService */
+		/* @phan-suppress-next-line PhanUndeclaredMethod */
 		$backendService = $server->getStoragesBackendService();
 		$backendService->registerBackendProvider($this);
 		$backendService->registerAuthMechanismProvider($this);

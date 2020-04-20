@@ -43,6 +43,8 @@ use Aws\S3\S3Client;
 use GuzzleHttp\Event\BeforeEvent;
 use GuzzleHttp\Ring\Client\StreamHandler;
 use Icewind\Streams\IteratorDirectory;
+use OCP\ILogger;
+use OCP\ITempManager;
 
 class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 
@@ -77,6 +79,14 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 
 	/** @var string */
 	private $id;
+
+	/** @var ILogger */
+	private $logger;
+
+	/**
+	 * @var ITempManager
+	 */
+	private $tempManager;
 
 	/**
 	 * @param string $path
@@ -116,6 +126,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	 * AmazonS3 constructor.
 	 *
 	 * @param array $params
+	 *
 	 * @throws \Exception
 	 */
 	public function __construct($params) {
@@ -135,6 +146,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 			$params['port'] = ($params['use_ssl'] === false) ? 80 : 443;
 		}
 		$this->params = $params;
+		$this->logger = \OC::$server->getLogger();
+		$this->tempManager = \OC::$server->getTempManager();
 	}
 
 	/**
@@ -173,7 +186,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 			]);
 			$this->testTimeout();
 		} catch (S3Exception $e) {
-			\OCP\Util::logException('files_external', $e);
+			$this->logger->logException($e, ['app'=>'files_external']);
 			return false;
 		}
 
@@ -221,6 +234,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 			do {
 				// instead of the iterator, manually loop over the list ...
 				$objects = $this->getConnection()->listObjects($params);
+				/** @phan-suppress-next-line PhanDeprecatedFunction */
 				$keys = $objects->getPath('Contents/*/Key');
 				if (empty($keys)) {
 					continue;
@@ -240,7 +254,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 				// we reached the end when the list is no longer truncated
 			} while ($objects['IsTruncated']);
 		} catch (S3Exception $e) {
-			\OCP\Util::logException('files_external', $e);
+			$this->logger->logException($e, ['app'=>'files_external']);
 			return false;
 		}
 		return true;
@@ -276,7 +290,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 
 			return IteratorDirectory::wrap($files);
 		} catch (S3Exception $e) {
-			\OCP\Util::logException('files_external', $e);
+			$this->logger->logException($e, ['app'=>'files_external']);
 			return false;
 		}
 	}
@@ -307,7 +321,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 
 			return $stat;
 		} catch (S3Exception $e) {
-			\OCP\Util::logException('files_external', $e);
+			$this->logger->logException($e, ['app'=>'files_external']);
 			return false;
 		}
 	}
@@ -327,7 +341,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 				return 'dir';
 			}
 		} catch (S3Exception $e) {
-			\OCP\Util::logException('files_external', $e);
+			$this->logger->logException($e, ['app'=>'files_external']);
 			return false;
 		}
 
@@ -348,7 +362,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 			]);
 			$this->testTimeout();
 		} catch (S3Exception $e) {
-			\OCP\Util::logException('files_external', $e);
+			$this->logger->logException($e, ['app'=>'files_external']);
 			return false;
 		}
 
@@ -361,7 +375,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 		switch ($mode) {
 			case 'r':
 			case 'rb':
-				$tmpFile = \OCP\Files::tmpFile();
+				$tmpFile = $this->tempManager->getTemporaryFile();
 				self::$tmpFiles[$tmpFile] = $path;
 
 				try {
@@ -371,7 +385,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 						'SaveAs' => $tmpFile
 					]);
 				} catch (S3Exception $e) {
-					\OCP\Util::logException('files_external', $e);
+					$this->logger->logException($e, ['app'=>'files_external']);
 					return false;
 				}
 
@@ -393,7 +407,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 				} else {
 					$ext = '';
 				}
-				$tmpFile = \OCP\Files::tmpFile($ext);
+				$tmpFile = $this->tempManager->getTemporaryFile($ext);
 				\OC\Files\Stream\Close::registerCallback($tmpFile, [$this, 'writeBack']);
 				if ($this->file_exists($path)) {
 					$source = $this->fopen($path, 'r');
@@ -443,7 +457,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 				$this->testTimeout();
 			}
 		} catch (S3Exception $e) {
-			\OCP\Util::logException('files_external', $e);
+			$this->logger->logException($e, ['app'=>'files_external']);
 			return false;
 		}
 
@@ -463,7 +477,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 				]);
 				$this->testTimeout();
 			} catch (S3Exception $e) {
-				\OCP\Util::logException('files_external', $e);
+				$this->logger->logException($e, ['app'=>'files_external']);
 				return false;
 			}
 		} else {
@@ -477,7 +491,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 				]);
 				$this->testTimeout();
 			} catch (S3Exception $e) {
-				\OCP\Util::logException('files_external', $e);
+				$this->logger->logException($e, ['app'=>'files_external']);
 				return false;
 			}
 
@@ -530,6 +544,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 			$test = $this->getConnection()->getBucketAcl([
 				'Bucket' => $this->bucket,
 			]);
+			/** @phan-suppress-next-line PhanDeprecatedFunction */
 			if ($test !== null && $test->getPath('Owner/ID') !== null) {
 				return true;
 			}
@@ -537,9 +552,11 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 		}
 
 		$buckets = $this->getConnection()->listBuckets();
+		/** @phan-suppress-next-line PhanDeprecatedFunction */
 		if ($buckets->getPath('Owner/ID') === null) {
 			return false;
 		}
+		/** @phan-suppress-next-line PhanDeprecatedFunction */
 		$bucketExists = !empty(\array_filter($buckets->getPath('Buckets'), function ($k) {
 			return $k['Name'] === $this->bucket;
 		}));
@@ -594,6 +611,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 		});
 		$h = new GuzzleHandler($client);
 		$config['http_handler'] = $h;
+		/* @phan-suppress-next-line PhanDeprecatedFunction */
 		$this->connection = S3Client::factory($config);
 
 		if (!$this->connection->doesBucketExist($this->bucket)) {
@@ -601,6 +619,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 				$this->connection->createBucket([
 					'Bucket' => $this->bucket
 				]);
+				/* @phan-suppress-next-line PhanUndeclaredFunctionInCallable */
 				$this->connection->waitUntil('BucketExists', [
 					'Bucket' => $this->bucket,
 					'waiter.interval' => 1,
@@ -608,7 +627,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 				]);
 				$this->testTimeout();
 			} catch (S3Exception $e) {
-				\OCP\Util::logException('files_external', $e);
+				$this->logger->logException($e, ['app'=>'files_external']);
 				throw new \Exception('Creation of bucket failed. '.$e->getMessage());
 			}
 		}
@@ -633,7 +652,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 
 			\unlink($tmpFile);
 		} catch (S3Exception $e) {
-			\OCP\Util::logException('files_external', $e);
+			$this->logger->logException($e, ['app'=>'files_external']);
 			return false;
 		}
 	}
