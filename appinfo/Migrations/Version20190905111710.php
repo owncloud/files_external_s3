@@ -31,6 +31,10 @@ use OCP\Migration\ISqlMigration;
  * to get the data, after upgrade.
  */
 class Version20190905111710 implements ISqlMigration {
+	/**
+	 * @param IDBConnection $connection
+	 * @return array|string
+	 */
 	public function sql(IDBConnection $connection) {
 		$qb = $connection->getQueryBuilder();
 		$qb->update('external_mounts')
