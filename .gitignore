@@ -16,3 +16,6 @@ vendor-bin/**/composer.lock
 tests/unit/config.php
 # SonarCloud scanner
 .scannerwork
+
+# Generated from .drone.star
+.drone.yml
