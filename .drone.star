@@ -19,10 +19,14 @@ config = {
     "phpstan": True,
     "phan": True,
     "phpunit": {
-        "scality": {
+        "scality74": {
             "databases": [
                 "sqlite",
             ],
+            "phpVersions": [
+                "7.4",
+            ],
+            "coverage": True,
             "scalityS3": {
                 "createFirstBucket": False,
                 "extraEnvironment": {
@@ -42,10 +46,62 @@ config = {
                 },
             ],
         },
-        "ceph": {
+        "scality73": {
             "databases": [
                 "sqlite",
             ],
+            "phpVersions": [
+                "7.3",
+            ],
+            "coverage": False,
+            "scalityS3": {
+                "createFirstBucket": False,
+                "extraEnvironment": {
+                    "SCALITY_ACCESS_KEY_ID": "owncloud123456",
+                    "SCALITY_SECRET_ACCESS_KEY": "secret123456",
+                },
+            },
+            "includeKeyInMatrixName": True,
+            "extraSetup": [
+                {
+                    "name": "scality-config",
+                    "image": "owncloudci/php:7.4",
+                    "pull": "always",
+                    "commands": [
+                        "cp tests/drone/configs/config.scality.php tests/unit/config.php",
+                    ],
+                },
+            ],
+        },
+        "ceph74": {
+            "databases": [
+                "sqlite",
+            ],
+            "phpVersions": [
+                "7.4",
+            ],
+            "coverage": True,
+            "cephS3": True,
+            "includeKeyInMatrixName": True,
+            "extraSetup": [
+                {
+                    "name": "ceph-config",
+                    "image": "owncloudci/php:7.4",
+                    "pull": "always",
+                    "commands": [
+                        "cp tests/drone/configs/config.ceph.php tests/unit/config.php",
+                    ],
+                },
+            ],
+        },
+        "ceph73": {
+            "databases": [
+                "sqlite",
+            ],
+            "phpVersions": [
+                "7.3",
+            ],
+            "coverage": False,
             "cephS3": True,
             "includeKeyInMatrixName": True,
             "extraSetup": [
