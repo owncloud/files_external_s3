@@ -37,14 +37,15 @@
 
 namespace OCA\FilesExternalS3\Storage;
 
-use Aws\Handler\GuzzleV5\GuzzleHandler;
+use Aws\Handler\GuzzleV6\GuzzleHandler;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
-use GuzzleHttp\Event\BeforeEvent;
-use GuzzleHttp\Ring\Client\StreamHandler;
+use GuzzleHttp\Handler\StreamHandler;
+use GuzzleHttp\Middleware;
 use Icewind\Streams\IteratorDirectory;
 use OCP\ILogger;
 use OCP\ITempManager;
+use Psr\Http\Message\RequestInterface;
 
 class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 
@@ -596,23 +597,25 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 			'endpoint' => $base_url,
 			'use_path_style_endpoint' => $this->params['use_path_style'],
 		];
-		$client = new \GuzzleHttp\Client(['handler' => new StreamHandler()]);
-		$emitter = $client->getEmitter();
-		$emitter->on('before', function (BeforeEvent $event) {
-			$request = $event->getRequest();
+		// Create a handler stack that has all of the default middlewares attached
+		$handler = \GuzzleHttp\HandlerStack::create(new StreamHandler());
+		// Push the handler onto the handler stack
+		$handler->push(Middleware::mapRequest(function (RequestInterface $request) {
 			if ($request->getMethod() !== 'PUT') {
-				return;
+				return $request;
 			}
 			$body = $request->getBody();
 			if ($body !== null && $body->getSize() !== 0) {
-				return;
+				return $request;
 			}
 			if ($request->hasHeader('Content-Length')) {
-				return;
+				return $request;
 			}
 			// force content length header on empty body
-			$request->setHeader('Content-Length', '0');
-		});
+			return $request->withHeader('Content-Length', '0');
+		}));
+		// Inject the handler into the client
+		$client = new \GuzzleHttp\Client(['handler' => $handler]);
 		$h = new GuzzleHandler($client);
 		$config['http_handler'] = $h;
 		/* @phan-suppress-next-line PhanDeprecatedFunction */

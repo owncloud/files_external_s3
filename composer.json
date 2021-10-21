@@ -13,7 +13,8 @@
         }
     },
     "replace": {
-        "guzzlehttp/guzzle": "*"
+        "guzzlehttp/guzzle": "*",
+        "guzzlehttp/psr7": "*"
     },
     "require": {
         "aws/aws-sdk-php": "^3.93"
