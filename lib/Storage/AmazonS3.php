@@ -312,6 +312,10 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 
 				$stat['size'] = $result['ContentLength'] ?: 0;
 				if (isset($result['Metadata']['lastmodified'])) {
+					// The underlying type doc for headObject says that it is an \Aws\Result
+					// And phan understands that Result should have only 1 level
+					// of array keys that are strings. But actually it can have 2 levels.
+					/** @phan-suppress-next-line PhanTypeMismatchDimFetch */
 					$stat['mtime'] = \strtotime($result['Metadata']['lastmodified']);
 				} else {
 					$stat['mtime'] = \strtotime($result['LastModified']);
