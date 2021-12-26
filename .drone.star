@@ -50,33 +50,6 @@ config = {
                 },
             ],
         },
-        "scality73": {
-            "databases": [
-                "sqlite",
-            ],
-            "phpVersions": [
-                "7.4",
-            ],
-            "coverage": False,
-            "scalityS3": {
-                "createFirstBucket": False,
-                "extraEnvironment": {
-                    "SCALITY_ACCESS_KEY_ID": "owncloud123456",
-                    "SCALITY_SECRET_ACCESS_KEY": "secret123456",
-                },
-            },
-            "includeKeyInMatrixName": True,
-            "extraSetup": [
-                {
-                    "name": "scality-config",
-                    "image": "owncloudci/php:7.4",
-                    "pull": "always",
-                    "commands": [
-                        "cp tests/drone/configs/config.scality.php tests/unit/config.php",
-                    ],
-                },
-            ],
-        },
         "ceph74": {
             "databases": [
                 "sqlite",
@@ -85,27 +58,6 @@ config = {
                 "7.4",
             ],
             "coverage": True,
-            "cephS3": True,
-            "includeKeyInMatrixName": True,
-            "extraSetup": [
-                {
-                    "name": "ceph-config",
-                    "image": "owncloudci/php:7.4",
-                    "pull": "always",
-                    "commands": [
-                        "cp tests/drone/configs/config.ceph.php tests/unit/config.php",
-                    ],
-                },
-            ],
-        },
-        "ceph73": {
-            "databases": [
-                "sqlite",
-            ],
-            "phpVersions": [
-                "7.4",
-            ],
-            "coverage": False,
             "cephS3": True,
             "includeKeyInMatrixName": True,
             "extraSetup": [
@@ -290,7 +242,7 @@ def jscodestyle(ctx):
         "steps": [
             {
                 "name": "coding-standard-js",
-                "image": "owncloudci/nodejs:14",
+                "image": OC_CI_NODEJS,
                 "pull": "always",
                 "commands": [
                     "make test-js-style",
@@ -1171,6 +1123,7 @@ def acceptance(ctx):
                              setupScality(testConfig["scalityS3"]) +
                              setupElasticSearch(testConfig["esVersion"]) +
                              testConfig["extraSetup"] +
+                             waitForServer(testConfig["federatedServerNeeded"]) +
                              waitForEmailService(testConfig["emailNeeded"]) +
                              fixPermissions(testConfig["phpVersion"], testConfig["federatedServerNeeded"], params["selUserNeeded"]) +
                              waitForBrowserService(testConfig["browser"]) +
@@ -1260,7 +1213,7 @@ def sonarAnalysis(ctx, phpVersion = "7.4"):
         "steps": [
                      {
                          "name": "clone",
-                         "image": "owncloudci/alpine:latest",
+                         "image": OC_CI_ALPINE,
                          "commands": [
                              "git clone https://github.com/%s.git ." % repo_slug,
                              "git checkout $DRONE_COMMIT",
@@ -1466,6 +1419,18 @@ def emailService(emailNeeded):
             "name": "email",
             "image": "mailhog/mailhog",
             "pull": "always",
+        }]
+
+    return []
+
+def waitForEmailService(emailNeeded):
+    if emailNeeded:
+        return [{
+            "name": "wait-for-email",
+            "image": OC_CI_WAIT_FOR,
+            "commands": [
+                "wait-for -it email:8025 -t 600",
+            ],
         }]
 
     return []
@@ -1888,6 +1853,18 @@ def setupElasticSearch(esVersion):
         },
     ]
 
+def waitForServer(federatedServerNeeded):
+    return [{
+        "name": "wait-for-server",
+        "image": OC_CI_WAIT_FOR,
+        "pull": "always",
+        "commands": [
+            "wait-for -it server:80 -t 600",
+        ] + ([
+            "wait-for -it federated:80 -t 600",
+        ] if federatedServerNeeded else []),
+    }]
+
 def fixPermissions(phpVersion, federatedServerNeeded, selUserNeeded = False):
     return [{
         "name": "fix-permissions",
@@ -2178,27 +2155,3 @@ def lintTest():
             "make test-lint",
         ],
     }]
-
-def waitForServer(federatedServerNeeded):
-    return [{
-        "name": "wait-for-server",
-        "image": OC_CI_WAIT_FOR,
-        "pull": "always",
-        "commands": [
-            "wait-for -it server:80 -t 600",
-        ] + ([
-            "wait-for -it federated:80 -t 600",
-        ] if federatedServerNeeded else []),
-    }]
-
-def waitForEmailService(emailNeeded):
-    if emailNeeded:
-        return [{
-            "name": "wait-for-email",
-            "image": OC_CI_WAIT_FOR,
-            "commands": [
-                "wait-for -it email:8025 -t 600",
-            ],
-        }]
-
-    return []
