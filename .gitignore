@@ -20,3 +20,5 @@ tests/unit/config.php
 
 # Generated from .drone.star
 .drone.yml
+
+.idea/
