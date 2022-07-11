@@ -58,16 +58,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.229.1",
+            "version": "3.231.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "5cffc0b16d1f33029628586313e9cf140f18b06d"
+                "reference": "9a7c2a8c4b7f95074749e1a7b575e6b4486bdcab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/5cffc0b16d1f33029628586313e9cf140f18b06d",
-                "reference": "5cffc0b16d1f33029628586313e9cf140f18b06d",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/9a7c2a8c4b7f95074749e1a7b575e6b4486bdcab",
+                "reference": "9a7c2a8c4b7f95074749e1a7b575e6b4486bdcab",
                 "shasum": ""
             },
             "require": {
@@ -85,6 +85,7 @@
                 "andrewsville/php-token-reflection": "^1.4",
                 "aws/aws-php-sns-message-validator": "~1.0",
                 "behat/behat": "~3.0",
+                "composer/composer": "^1.10.22",
                 "doctrine/cache": "~1.4",
                 "ext-dom": "*",
                 "ext-openssl": "*",
@@ -143,9 +144,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.229.1"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.231.2"
             },
-            "time": "2022-06-30T18:16:30+00:00"
+            "time": "2022-07-08T18:16:11+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -379,16 +380,16 @@
     "packages-dev": [
         {
             "name": "bamarni/composer-bin-plugin",
-            "version": "1.6.0",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bamarni/composer-bin-plugin.git",
-                "reference": "80b2f1ca19ff81e9aea495e7cf70443e70d12048"
+                "reference": "c1bbee3662a2a84c6aad84b7c6daefcae29e5690"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bamarni/composer-bin-plugin/zipball/80b2f1ca19ff81e9aea495e7cf70443e70d12048",
-                "reference": "80b2f1ca19ff81e9aea495e7cf70443e70d12048",
+                "url": "https://api.github.com/repos/bamarni/composer-bin-plugin/zipball/c1bbee3662a2a84c6aad84b7c6daefcae29e5690",
+                "reference": "c1bbee3662a2a84c6aad84b7c6daefcae29e5690",
                 "shasum": ""
             },
             "require": {
@@ -397,8 +398,14 @@
             },
             "require-dev": {
                 "composer/composer": "^2.0",
+                "ext-json": "*",
                 "phpstan/extension-installer": "^1.1",
-                "symfony/console": "^5.4.7 || ^6.0.7"
+                "phpstan/phpstan": "^1.8",
+                "phpstan/phpstan-phpunit": "^1.1",
+                "phpunit/phpunit": "^8.5 || ^9.5",
+                "symfony/console": "^5.4.7 || ^6.0.7",
+                "symfony/finder": "^5.4.7 || ^6.0.7",
+                "symfony/process": "^5.4.7 || ^6.0.7"
             },
             "type": "composer-plugin",
             "extra": {
@@ -424,9 +431,9 @@
             ],
             "support": {
                 "issues": "https://github.com/bamarni/composer-bin-plugin/issues",
-                "source": "https://github.com/bamarni/composer-bin-plugin/tree/1.6.0"
+                "source": "https://github.com/bamarni/composer-bin-plugin/tree/1.7.0"
             },
-            "time": "2022-07-06T22:16:05+00:00"
+            "time": "2022-07-10T17:28:16+00:00"
         }
     ],
     "aliases": [],
