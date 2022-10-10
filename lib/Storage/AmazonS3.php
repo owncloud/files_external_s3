@@ -40,14 +40,17 @@ namespace OCA\FilesExternalS3\Storage;
 use Aws\Handler\GuzzleV6\GuzzleHandler;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
-use GuzzleHttp\Handler\StreamHandler;
+use DateTimeInterface;
+use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\Middleware;
 use Icewind\Streams\IteratorDirectory;
+use OCP\Files\Storage\StorageAdapter;
+use OCP\Files\StorageNotAvailableException;
 use OCP\ILogger;
 use OCP\ITempManager;
 use Psr\Http\Message\RequestInterface;
 
-class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
+class AmazonS3 extends StorageAdapter {
 
 	/**
 	 * @var \Aws\S3\S3Client
@@ -93,7 +96,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	 * @param string $path
 	 * @return string correctly encoded path
 	 */
-	private function normalizePath($path) {
+	private function normalizePath($path): string {
 		$path = \trim($path, '/');
 
 		if (!$path) {
@@ -106,17 +109,17 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	/**
 	 * when running the tests wait to let the buckets catch up
 	 */
-	private function testTimeout() {
+	private function testTimeout(): void {
 		if ($this->test) {
 			\sleep($this->timeout);
 		}
 	}
 
-	private function isRoot($path) {
+	private function isRoot($path): bool {
 		return $path === '.';
 	}
 
-	private function cleanKey($path) {
+	private function cleanKey($path): string {
 		if ($this->isRoot($path)) {
 			return '/';
 		}
@@ -139,8 +142,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 
 		$this->bucket = $params['bucket'];
 		$this->test = isset($params['test']);
-		$this->timeout = !isset($params['timeout']) ? 15 : $params['timeout'];
-		$this->rescanDelay = !isset($params['rescanDelay']) ? 10 : $params['rescanDelay'];
+		$this->timeout = $params['timeout'] ?? 15;
+		$this->rescanDelay = $params['rescanDelay'] ?? 10;
 		$params['region'] = empty($params['region']) ? 'eu-west-1' : $params['region'];
 		$params['hostname'] = empty($params['hostname']) ? 's3.amazonaws.com' : $params['hostname'];
 		if (!isset($params['port']) || $params['port'] === '') {
@@ -156,6 +159,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	 *
 	 * @param string $path
 	 * @return bool
+	 * @throws StorageNotAvailableException
 	 */
 	protected function remove($path) {
 		// remember fileType to reduce http calls
@@ -222,6 +226,9 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 		}
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	private function batchDelete($path = null) {
 		$params = [
 			'Bucket' => $this->bucket
@@ -240,8 +247,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 				if (empty($keys)) {
 					continue;
 				}
-				$keys = \array_map(function ($key) {
-					echo $key;
+				$keys = \array_map(static function ($key) {
 					return ['Key' => $key];
 				}, $keys);
 				// ... so we can delete the files in batches
@@ -353,6 +359,9 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 		return false;
 	}
 
+	/**
+	 * @throws StorageNotAvailableException
+	 */
 	public function unlink($path) {
 		$path = $this->normalizePath($path);
 
@@ -394,7 +403,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 					return false;
 				}
 
-				return \fopen($tmpFile, 'r');
+				return \fopen($tmpFile, 'rb');
 			case 'w':
 			case 'wb':
 			case 'a':
@@ -432,7 +441,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 			$mtime = \time();
 		}
 		$metadata = [
-			'lastmodified' => \gmdate(\DateTime::RFC1123, $mtime)
+			'lastmodified' => \gmdate(DateTimeInterface::RFC1123, $mtime)
 		];
 
 		$fileType = $this->filetype($path);
@@ -544,6 +553,9 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 		return true;
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function test() {
 		if ($this->getConnection()->getApi()->hasOperation('GetBucketAcl')) {
 			$test = $this->getConnection()->getBucketAcl([
@@ -578,7 +590,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	 * @return S3Client connected client
 	 * @throws \Exception if connection could not be made
 	 */
-	public function getConnection() {
+	public function getConnection(): S3Client {
 		if ($this->connection !== null) {
 			return $this->connection;
 		}
@@ -597,10 +609,10 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 			'endpoint' => $base_url,
 			'use_path_style_endpoint' => $this->params['use_path_style'],
 		];
-		// Create a handler stack that has all of the default middlewares attached
-		$handler = \GuzzleHttp\HandlerStack::create(new StreamHandler());
+		// Create a handler stack that has all the default middlewares attached
+		$handler = \GuzzleHttp\HandlerStack::create(new CurlMultiHandler());
 		// Push the handler onto the handler stack
-		$handler->push(Middleware::mapRequest(function (RequestInterface $request) {
+		$handler->push(Middleware::mapRequest(static function (RequestInterface $request) {
 			if ($request->getMethod() !== 'PUT') {
 				return $request;
 			}
@@ -618,8 +630,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 		$client = new \GuzzleHttp\Client(['handler' => $handler]);
 		$h = new GuzzleHandler($client);
 		$config['http_handler'] = $h;
-		/* @phan-suppress-next-line PhanDeprecatedFunction */
-		$this->connection = S3Client::factory($config);
+
+		$this->connection = new S3Client($config);
 
 		if (!$this->connection->doesBucketExist($this->bucket)) {
 			try {
@@ -642,6 +654,9 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 		return $this->connection;
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function writeBack($tmpFile) {
 		if (!isset(self::$tmpFiles[$tmpFile])) {
 			return false;
@@ -669,5 +684,9 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	 */
 	public static function checkDependencies() {
 		return true;
+	}
+
+	public function usePartFile() {
+		return false;
 	}
 }
