@@ -20,6 +20,7 @@
         "aws/aws-sdk-php": "^3.93"
     },
     "require-dev": {
+        "roave/security-advisories": "dev-latest",
         "bamarni/composer-bin-plugin": "^1.4"
     },
     "extra": {
