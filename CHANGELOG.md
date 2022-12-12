@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- [#1007](https://github.com/owncloud/files_external_s3/pull/21007) - Feat: performance optimizations
+- [#1007](https://github.com/owncloud/files_external_s3/pull/1007) - Feat: performance optimizations
 
 
 ## [2.0.0] - 2022-07-05
