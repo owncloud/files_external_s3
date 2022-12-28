@@ -231,10 +231,8 @@ def codestyle(ctx):
                          [
                              {
                                  "name": "coding-standard",
-                                 "image": "owncloudci/php:7.4@sha256:3ec4e600382f88ede77c5fb6a012d63c8a469d805420a0eb5044d7bc91c8da18",
-                                 "pull": "always",
+                                 "image": OC_CI_PHP % phpVersion,
                                  "commands": [
-                                     "php -v",
                                      "make test-php-style",
                                  ],
                              },
