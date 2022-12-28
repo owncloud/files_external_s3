@@ -232,6 +232,7 @@ def codestyle(ctx):
                              {
                                  "name": "coding-standard",
                                  "image": OC_CI_PHP % phpVersion,
+                                 "pull": "always",
                                  "commands": [
                                      "php -v",
                                      "make test-php-style",
