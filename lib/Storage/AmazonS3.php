@@ -243,7 +243,7 @@ class AmazonS3 extends StorageAdapter {
 				// instead of the iterator, manually loop over the list ...
 				$objects = $this->getConnection()->listObjects($params);
 				/** @phan-suppress-next-line PhanDeprecatedFunction */
-				$keys = $objects->getPath('Contents/*/Key');
+				$keys = $objects->getPath('Contents[].Key');
 				if (empty($keys)) {
 					continue;
 				}
