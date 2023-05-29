@@ -51,7 +51,6 @@ use OCP\ITempManager;
 use Psr\Http\Message\RequestInterface;
 
 class AmazonS3 extends StorageAdapter {
-
 	/**
 	 * @var \Aws\S3\S3Client
 	 */
