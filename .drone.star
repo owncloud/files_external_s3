@@ -53,7 +53,7 @@ dir = {
 config = {
     "rocketchat": {
         "channel": "builds",
-        "from_secret": "rocketchat_chat_webhook",
+        "from_secret": "rocketchat_talk_webhook",
     },
     "appInstallCommandPhp": "composer install -n --no-progress",
     "branches": [
