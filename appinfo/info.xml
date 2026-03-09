@@ -26,7 +26,8 @@ Administrators and users (when enabled) can find external storage configuration 
 
     <use-migrations>true</use-migrations>
     <dependencies>
-        <owncloud min-version="10.15" max-version="11"/>
+        <owncloud min-version="11" max-version="11"/>
+        <php min-version="8.3"/>
     </dependencies>
     <website>https://github.com/owncloud/files_external_s3/</website>
     <bugs>https://github.com/owncloud/files_external_s3/issues</bugs>
