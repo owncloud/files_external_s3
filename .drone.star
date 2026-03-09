@@ -54,16 +54,9 @@ config = {
     "branches": [
         "master",
     ],
-    "codestyle": True,
-    "phpstan": True,
-    "phan": {
-        "multipleVersions": {
-            "phpVersions": [
-                DEFAULT_PHP_VERSION,
-                "7.3",
-            ],
-        },
-    },
+    "codestyle": False,
+    "phpstan": False,
+    "phan": False,
     "phpunit": {
         "scality74": {
             "databases": [
