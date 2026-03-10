@@ -37,7 +37,7 @@
 
 namespace OCA\FilesExternalS3\Storage;
 
-use Aws\Handler\GuzzleV6\GuzzleHandler;
+use Aws\Handler\Guzzle\GuzzleHandler;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use DateTimeInterface;
