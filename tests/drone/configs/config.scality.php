@@ -3,7 +3,7 @@
 return [
 	'run'           => true,
 	'bucket'        => 'owncloud',
-	'hostname'      => 'scality',
+	'hostname'      => 'localhost',
 	'port'          => '8000',
 	'key'           => 'owncloud123456',
 	'secret'        => 'secret123456',

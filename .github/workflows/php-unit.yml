@@ -44,6 +44,16 @@ on:
         required: false
         type: string
         default: ''
+      use-scality-s3:
+        description: 'Provide a scality S3 server for tests to use'
+        required: false
+        type: boolean
+        default: false
+      use-ceph-s3:
+        description: 'Provide a ceph S3 server for tests to use'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -139,6 +149,25 @@ jobs:
         env:
           fail-fast: true
           KRB5_LINUX_LIBS: libkrb5-dev
+
+      - name: Scality S3 Server
+        if: ${{ inputs.use-scality-s3 }}
+        env:
+          HOST_NAME: localhost
+          SCALITY_ACCESS_KEY_ID: owncloud123456
+          SCALITY_SECRET_ACCESS_KEY: secret123456
+        run: |
+          docker run -d --rm --network host \
+            --name scality \
+            owncloudci/scality-s3server
+
+      - name: Setup for Scality S3 Server tests
+        if: ${{ inputs.use-scality-s3 }}
+        env:
+          APP_NAME: ${{ inputs.app-name }}
+        run: |
+          cd "apps/${APP_NAME}"
+          cp tests/drone/configs/config.scality.php tests/unit/config.php
 
       - name: Install Core Dependencies
         run: |
