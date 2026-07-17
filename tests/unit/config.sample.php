@@ -9,4 +9,5 @@ return [
 	'secret'        => 'secret123456',
 	'use_ssl'       => false,
 	'use_path_style'=> true,
+	'test'          => true,
 ];
